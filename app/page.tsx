@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
+import { getSignedInClaims } from "@/lib/supabase/user";
 import LoginForm from "./login-form";
+import PseudoForm from "./pseudo-form";
 import SignOutButton from "./sign-out-button";
 
 export default async function Home({
@@ -8,25 +10,17 @@ export default async function Home({
   searchParams: Promise<{ auth_error?: string }>;
 }) {
   const { auth_error } = await searchParams;
-  const supabase = await createClient();
+  const claims = await getSignedInClaims();
 
-  // getClaims() vérifie la signature du JWT (contrairement à getSession()
-  // dont les cookies ne sont pas fiables côté serveur).
-  const { data } = await supabase.auth.getClaims();
-  const claims = data?.claims;
-
-  // L'app mobile ouvre une session anonyme par défaut : côté web, une session
-  // anonyme équivaut à "non connecté".
-  const isSignedIn = !!claims && !claims.is_anonymous;
-
-  let pseudo: string | null = null;
-  if (isSignedIn) {
+  let pseudo = "";
+  if (claims) {
+    const supabase = await createClient();
     const { data: profile } = await supabase
       .from("profiles")
       .select("pseudo")
       .eq("id", claims.sub)
       .maybeSingle();
-    pseudo = profile?.pseudo ?? null;
+    pseudo = profile?.pseudo ?? "";
   }
 
   return (
@@ -38,11 +32,20 @@ export default async function Home({
         </p>
       </div>
 
-      {isSignedIn ? (
-        <div className="flex flex-col items-center gap-4 text-center">
-          <p className="text-lg">
-            Bonjour <span className="font-semibold">{pseudo ?? claims.email}</span>
-          </p>
+      {claims ? (
+        <div className="flex w-full max-w-sm flex-col items-center gap-6 text-center">
+          <div>
+            <p className="text-lg">
+              Bonjour{" "}
+              <span className="font-semibold">{pseudo || claims.email}</span>
+            </p>
+            {claims.email && pseudo && (
+              <p className="text-sm text-zinc-500">{claims.email}</p>
+            )}
+          </div>
+          <div className="w-full text-left">
+            <PseudoForm userId={claims.sub} initialPseudo={pseudo} />
+          </div>
           <SignOutButton />
         </div>
       ) : (

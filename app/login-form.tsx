@@ -1,8 +1,15 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import GoogleButton from "@/components/google-button";
+import {
+  inputClass,
+  linkClass,
+  primaryButtonClass,
+} from "@/components/form-styles";
 
 // Codes d'erreur Supabase Auth -> messages en français.
 const ERROR_MESSAGES: Record<string, string> = {
@@ -40,26 +47,6 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
     router.refresh();
   }
 
-  async function handleGoogleLogin() {
-    setError(null);
-    setLoading(true);
-
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    });
-
-    // En cas de succès le navigateur est redirigé vers Google.
-    if (error) {
-      setError("Connexion avec Google impossible. Réessayez dans un instant.");
-      setLoading(false);
-    }
-  }
-
-  const inputClass =
-    "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50";
-
   return (
     <div className="flex w-full max-w-sm flex-col gap-5">
       <form onSubmit={handlePasswordLogin} className="flex flex-col gap-4">
@@ -92,13 +79,16 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-lg bg-emerald-700 px-4 py-2 font-medium text-white transition hover:bg-emerald-800 disabled:opacity-60"
-        >
+        <button type="submit" disabled={loading} className={primaryButtonClass}>
           {loading ? "Connexion…" : "Se connecter"}
         </button>
+
+        <Link
+          href="/mot-de-passe-oublie"
+          className={`${linkClass} self-center text-sm`}
+        >
+          Mot de passe oublié ?
+        </Link>
       </form>
 
       <div className="flex items-center gap-3 text-xs text-zinc-500">
@@ -107,14 +97,24 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
         <span className="h-px flex-1 bg-zinc-300 dark:bg-zinc-700" />
       </div>
 
-      <button
-        type="button"
-        onClick={handleGoogleLogin}
+      <GoogleButton
         disabled={loading}
-        className="rounded-lg border border-zinc-300 bg-white px-4 py-2 font-medium text-zinc-900 transition hover:bg-zinc-50 disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
-      >
-        Continuer avec Google
-      </button>
+        onStart={() => {
+          setError(null);
+          setLoading(true);
+        }}
+        onError={(message) => {
+          setError(message);
+          setLoading(false);
+        }}
+      />
+
+      <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
+        Pas encore de compte ?{" "}
+        <Link href="/inscription" className={linkClass}>
+          Créer un compte
+        </Link>
+      </p>
     </div>
   );
 }
