@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useSyncExternalStore, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -19,16 +19,44 @@ const ERROR_MESSAGES: Record<string, string> = {
   over_email_send_rate_limit: "Trop de tentatives. Réessayez dans quelques minutes.",
 };
 
+function subscribeToHash(onChange: () => void) {
+  window.addEventListener("hashchange", onChange);
+  return () => window.removeEventListener("hashchange", onChange);
+}
+
 export default function LoginForm({ initialError }: { initialError?: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(initialError ?? null);
+  const [info, setInfo] = useState<string | null>(null);
+  const [canResend, setCanResend] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Quand Supabase refuse un lien d'email (expiré, déjà utilisé...), il
+  // redirige avec l'erreur dans le fragment de l'URL (#error_code=...), que
+  // le serveur ne voit jamais : on la lit côté navigateur pour l'expliquer.
+  const hashErrorCode = useSyncExternalStore(
+    subscribeToHash,
+    () => new URLSearchParams(window.location.hash.slice(1)).get("error_code"),
+    () => null,
+  );
+  const [hashDismissed, setHashDismissed] = useState(false);
+  const showHashError = !!hashErrorCode && !hashDismissed;
+  const hashError = !showHashError
+    ? null
+    : hashErrorCode === "otp_expired"
+      ? "Ce lien a expiré ou a déjà été utilisé. Si vous avez fait plusieurs demandes, seul le dernier email reçu est valable."
+      : "La connexion a échoué. Veuillez réessayer.";
+  const resendVisible =
+    canResend || (showHashError && hashErrorCode === "otp_expired");
 
   async function handlePasswordLogin(e: FormEvent) {
     e.preventDefault();
+    setHashDismissed(true);
     setError(null);
+    setInfo(null);
+    setCanResend(false);
     setLoading(true);
 
     const supabase = createClient();
@@ -39,12 +67,47 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
         ERROR_MESSAGES[error.code ?? ""] ??
           "Connexion impossible. Réessayez dans un instant.",
       );
+      setCanResend(error.code === "email_not_confirmed");
       setLoading(false);
       return;
     }
 
     // Re-rend la page serveur avec la nouvelle session (cookies).
     router.refresh();
+  }
+
+  async function handleResend() {
+    setHashDismissed(true);
+    setError(null);
+    setInfo(null);
+    if (!email) {
+      setError("Saisissez votre adresse email ci-dessus, puis réessayez.");
+      return;
+    }
+
+    setLoading(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/`,
+      },
+    });
+    setLoading(false);
+
+    if (error) {
+      setError(
+        error.code?.startsWith("over_")
+          ? "Trop de demandes. Réessayez dans quelques minutes."
+          : "Envoi impossible pour le moment. Réessayez dans un instant.",
+      );
+      return;
+    }
+    setCanResend(false);
+    setInfo(
+      "Email de confirmation renvoyé. Cliquez sur le lien du dernier email reçu.",
+    );
   }
 
   return (
@@ -73,10 +136,25 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
           />
         </label>
 
-        {error && (
+        {(hashError ?? error) && (
           <p role="alert" className="text-sm text-red-600 dark:text-red-400">
-            {error}
+            {hashError ?? error}
           </p>
+        )}
+        {info && (
+          <p role="status" className="text-sm text-emerald-700 dark:text-emerald-400">
+            {info}
+          </p>
+        )}
+        {resendVisible && (
+          <button
+            type="button"
+            onClick={handleResend}
+            disabled={loading}
+            className={`${linkClass} self-start text-sm`}
+          >
+            Renvoyer l&apos;email de confirmation
+          </button>
         )}
 
         <button type="submit" disabled={loading} className={primaryButtonClass}>
