@@ -1,10 +1,13 @@
 [
   {
-    "relation": ["delegate_permission/common.handle_all_urls"],
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
     "target": {
       "namespace": "android_app",
       "package_name": "com.meshiker.app",
       "sha256_cert_fingerprints": [
+        "64:92:16:9C:CB:E1:E7:F3:BD:E7:9E:DC:CC:46:3C:35:62:35:47:31:0E:97:92:32:87:F9:03:1C:7B:63:FB:B3",
         "56:09:B3:CB:5D:0E:23:6E:8C:37:FD:A3:5B:17:19:26:79:08:D5:33:53:9E:36:55:A0:1F:19:40:62:91:DF:3E",
         "C9:88:2F:1E:AF:48:E3:DF:CE:38:27:CE:7C:1B:46:65:F0:8F:83:74:F2:12:1A:67:B4:D2:39:E4:FE:77:8C:AC"
       ]
