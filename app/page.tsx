@@ -51,7 +51,9 @@ export default async function Home({
       ) : (
         <LoginForm
           initialError={
-            auth_error ? "La connexion a échoué. Veuillez réessayer." : undefined
+            auth_error
+              ? "Impossible d'ouvrir la session automatiquement. Si vous venez de confirmer votre adresse email, connectez-vous simplement avec votre email et votre mot de passe."
+              : undefined
           }
         />
       )}
