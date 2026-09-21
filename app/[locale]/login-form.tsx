@@ -5,6 +5,7 @@ import { useState, useSyncExternalStore, type FormEvent } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { authCallbackUrl } from "@/lib/auth-urls";
 import { createClient } from "@/lib/supabase/client";
+import PasswordInput from "@/components/password-input";
 import GoogleButton from "@/components/google-button";
 import {
   inputClass,
@@ -129,13 +130,10 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
         </label>
         <label className="flex flex-col gap-1.5 text-sm font-medium">
           {tf("password")}
-          <input
-            type="password"
-            required
+          <PasswordInput
             autoComplete="current-password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={inputClass}
+            onChange={setPassword}
           />
         </label>
 

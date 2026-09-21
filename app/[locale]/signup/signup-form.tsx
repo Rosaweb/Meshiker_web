@@ -6,6 +6,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { authCallbackUrl } from "@/lib/auth-urls";
 import { createClient } from "@/lib/supabase/client";
 import { PSEUDO_MAX, PSEUDO_MIN, validatePseudo } from "@/lib/pseudo";
+import PasswordInput from "@/components/password-input";
 import GoogleButton from "@/components/google-button";
 import {
   inputClass,
@@ -148,25 +149,19 @@ export default function SignupForm() {
         </label>
         <label className="flex flex-col gap-1.5 text-sm font-medium">
           {tf("password")}
-          <input
-            type="password"
-            required
+          <PasswordInput
             minLength={MIN_PASSWORD_LENGTH}
             autoComplete="new-password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={inputClass}
+            onChange={setPassword}
           />
         </label>
         <label className="flex flex-col gap-1.5 text-sm font-medium">
           {tf("confirmPassword")}
-          <input
-            type="password"
-            required
+          <PasswordInput
             autoComplete="new-password"
             value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            className={inputClass}
+            onChange={setConfirm}
           />
         </label>
 

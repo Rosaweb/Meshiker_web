@@ -19,6 +19,8 @@
     "confirmPassword": "Confirm password",
     "newPassword": "New password",
     "pseudo": "Username",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "pseudoHint": "Visible to other hikers (position sharing, shared tracks).",
     "or": "or"
   },
