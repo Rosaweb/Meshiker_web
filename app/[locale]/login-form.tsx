@@ -1,8 +1,9 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useState, useSyncExternalStore, type FormEvent } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
+import { authCallbackUrl } from "@/lib/auth-urls";
 import { createClient } from "@/lib/supabase/client";
 import GoogleButton from "@/components/google-button";
 import {
@@ -11,20 +12,15 @@ import {
   primaryButtonClass,
 } from "@/components/form-styles";
 
-// Codes d'erreur Supabase Auth -> messages en français.
-const ERROR_MESSAGES: Record<string, string> = {
-  invalid_credentials: "Email ou mot de passe incorrect.",
-  email_not_confirmed: "Votre adresse email n'a pas encore été confirmée.",
-  over_request_rate_limit: "Trop de tentatives. Réessayez dans quelques minutes.",
-  over_email_send_rate_limit: "Trop de tentatives. Réessayez dans quelques minutes.",
-};
-
 function subscribeToHash(onChange: () => void) {
   window.addEventListener("hashchange", onChange);
   return () => window.removeEventListener("hashchange", onChange);
 }
 
 export default function LoginForm({ initialError }: { initialError?: string }) {
+  const t = useTranslations("Login");
+  const tf = useTranslations("Fields");
+  const locale = useLocale();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -46,10 +42,24 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
   const hashError = !showHashError
     ? null
     : hashErrorCode === "otp_expired"
-      ? "Ce lien a expiré ou a déjà été utilisé. Si vous avez fait plusieurs demandes, seul le dernier email reçu est valable."
-      : "La connexion a échoué. Veuillez réessayer.";
+      ? t("linkExpired")
+      : t("failed");
   const resendVisible =
     canResend || (showHashError && hashErrorCode === "otp_expired");
+
+  function messageFor(code: string | undefined) {
+    switch (code) {
+      case "invalid_credentials":
+        return t("errors.invalid_credentials");
+      case "email_not_confirmed":
+        return t("errors.email_not_confirmed");
+      case "over_request_rate_limit":
+      case "over_email_send_rate_limit":
+        return t("errors.rate_limited");
+      default:
+        return t("errors.generic");
+    }
+  }
 
   async function handlePasswordLogin(e: FormEvent) {
     e.preventDefault();
@@ -63,10 +73,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      setError(
-        ERROR_MESSAGES[error.code ?? ""] ??
-          "Connexion impossible. Réessayez dans un instant.",
-      );
+      setError(messageFor(error.code));
       setCanResend(error.code === "email_not_confirmed");
       setLoading(false);
       return;
@@ -81,7 +88,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
     setError(null);
     setInfo(null);
     if (!email) {
-      setError("Saisissez votre adresse email ci-dessus, puis réessayez.");
+      setError(t("resendEnterEmail"));
       return;
     }
 
@@ -91,30 +98,26 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
       type: "signup",
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=/`,
+        emailRedirectTo: authCallbackUrl(window.location.origin, locale),
       },
     });
     setLoading(false);
 
     if (error) {
       setError(
-        error.code?.startsWith("over_")
-          ? "Trop de demandes. Réessayez dans quelques minutes."
-          : "Envoi impossible pour le moment. Réessayez dans un instant.",
+        error.code?.startsWith("over_") ? t("errors.rate_limited") : t("resendFailed"),
       );
       return;
     }
     setCanResend(false);
-    setInfo(
-      "Email de confirmation renvoyé. Cliquez sur le lien du dernier email reçu.",
-    );
+    setInfo(t("resendDone"));
   }
 
   return (
     <div className="flex w-full max-w-sm flex-col gap-5">
       <form onSubmit={handlePasswordLogin} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1.5 text-sm font-medium">
-          Email
+          {tf("email")}
           <input
             type="email"
             required
@@ -125,7 +128,7 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
           />
         </label>
         <label className="flex flex-col gap-1.5 text-sm font-medium">
-          Mot de passe
+          {tf("password")}
           <input
             type="password"
             required
@@ -153,25 +156,25 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
             disabled={loading}
             className={`${linkClass} self-start text-sm`}
           >
-            Renvoyer l&apos;email de confirmation
+            {t("resend")}
           </button>
         )}
 
         <button type="submit" disabled={loading} className={primaryButtonClass}>
-          {loading ? "Connexion…" : "Se connecter"}
+          {loading ? t("submitting") : t("submit")}
         </button>
 
         <Link
-          href="/mot-de-passe-oublie"
+          href="/forgot-password"
           className={`${linkClass} self-center text-sm`}
         >
-          Mot de passe oublié ?
+          {t("forgot")}
         </Link>
       </form>
 
       <div className="flex items-center gap-3 text-xs text-zinc-500">
         <span className="h-px flex-1 bg-zinc-300 dark:bg-zinc-700" />
-        ou
+        {tf("or")}
         <span className="h-px flex-1 bg-zinc-300 dark:bg-zinc-700" />
       </div>
 
@@ -188,9 +191,9 @@ export default function LoginForm({ initialError }: { initialError?: string }) {
       />
 
       <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
-        Pas encore de compte ?{" "}
-        <Link href="/inscription" className={linkClass}>
-          Créer un compte
+        {t("noAccount")}{" "}
+        <Link href="/signup" className={linkClass}>
+          {t("createAccount")}
         </Link>
       </p>
     </div>

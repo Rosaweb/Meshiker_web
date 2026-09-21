@@ -1,0 +1,127 @@
+{
+  "Meta": {
+    "title": "Meshiker",
+    "description": "Hiking navigation app"
+  },
+  "LocaleSwitcher": {
+    "label": "Language",
+    "fr": "Français",
+    "en": "English"
+  },
+  "Home": {
+    "tagline": "Hiking navigation, online and offline.",
+    "greeting": "Hello <strong>{name}</strong>",
+    "autoSessionFailed": "We couldn't sign you in automatically. If you just confirmed your email address, simply sign in with your email and password."
+  },
+  "Fields": {
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "newPassword": "New password",
+    "pseudo": "Username",
+    "pseudoHint": "Visible to other hikers (position sharing, shared tracks).",
+    "or": "or"
+  },
+  "Pseudo": {
+    "errorLength": "Your username must be between {min} and {max} characters long.",
+    "errorChars": "Your username contains characters that aren't allowed.",
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Username saved.",
+    "saveFailed": "Couldn't save your username. Please try again in a moment."
+  },
+  "Password": {
+    "tooShort": "Your password must be at least {min} characters long.",
+    "mismatch": "The two passwords don't match."
+  },
+  "Login": {
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "forgot": "Forgot your password?",
+    "noAccount": "Don't have an account yet?",
+    "createAccount": "Create an account",
+    "google": "Continue with Google",
+    "googleFailed": "Couldn't sign in with Google. Please try again in a moment.",
+    "resend": "Resend the confirmation email",
+    "resendEnterEmail": "Enter your email address above, then try again.",
+    "resendDone": "Confirmation email sent again. Click the link in the latest email you received.",
+    "resendFailed": "Couldn't send the email right now. Please try again in a moment.",
+    "linkExpired": "This link has expired or has already been used. If you made several requests, only the latest email is valid.",
+    "failed": "Sign-in failed. Please try again.",
+    "errors": {
+      "invalid_credentials": "Incorrect email or password.",
+      "email_not_confirmed": "Your email address hasn't been confirmed yet.",
+      "rate_limited": "Too many attempts. Please try again in a few minutes.",
+      "generic": "Couldn't sign in. Please try again in a moment."
+    }
+  },
+  "SignOut": {
+    "button": "Sign out"
+  },
+  "Signup": {
+    "metaTitle": "Create an account – Meshiker",
+    "title": "Create an account",
+    "subtitle": "The same account works on the website and in the app.",
+    "submit": "Create my account",
+    "submitting": "Creating your account…",
+    "haveAccount": "Already have an account?",
+    "signIn": "Sign in",
+    "checkTitle": "Check your inbox",
+    "checkBody": "If an account can be created with <strong>{email}</strong>, a confirmation email has just been sent. Click the link it contains to activate your account.",
+    "checkHelp": "Nothing received? Check your spam folder. Already have an account?",
+    "resetLink": "Reset your password",
+    "errors": {
+      "weak_password": "This password is too weak. Choose a longer or more varied one.",
+      "already_exists": "An account already exists with this address. Try signing in.",
+      "email_address_invalid": "This email address isn't valid.",
+      "signup_disabled": "Sign-ups are temporarily closed.",
+      "rate_limited": "Too many attempts. Please try again in a few minutes.",
+      "generic": "Couldn't create your account. Please try again in a moment."
+    }
+  },
+  "Forgot": {
+    "metaTitle": "Forgot your password – Meshiker",
+    "title": "Forgot your password",
+    "subtitle": "Enter your account's email address: we'll send you a link to choose a new password.",
+    "submit": "Send the link",
+    "submitting": "Sending…",
+    "back": "Back to sign-in",
+    "expired": "This link has expired or has already been used. Request a new one.",
+    "sentTitle": "Check your inbox",
+    "sentBody": "If an account exists for <strong>{email}</strong>, an email with a reset link has just been sent. The link is valid for one hour.",
+    "rateLimited": "Too many requests. Please try again in a few minutes.",
+    "failed": "Couldn't send the email right now. Please try again in a moment."
+  },
+  "Reset": {
+    "metaTitle": "New password – Meshiker",
+    "title": "New password",
+    "subtitle": "Choose a new password for your account.",
+    "submit": "Save password",
+    "submitting": "Saving…",
+    "invalidTitle": "Invalid link",
+    "invalidBody": "This link has expired or is no longer valid.",
+    "requestNew": "Request a new link",
+    "errors": {
+      "weak_password": "This password is too weak. Choose a longer or more varied one.",
+      "same_password": "The new password must be different from the old one.",
+      "generic": "Couldn't change your password. Request a new link and try again."
+    }
+  },
+  "Share": {
+    "metaTitle": "Shared track – Meshiker",
+    "unavailableTitle": "Link unavailable",
+    "unavailableBody": "This sharing link is invalid, has expired, or has been revoked. Ask the person who sent it to you to generate it again.",
+    "goHome": "Go to meshiker.com",
+    "title": "A track has been shared with you",
+    "sharedBy": "Shared by {name}",
+    "validUntil": "Link valid until {date}",
+    "download": "Download the GPX file",
+    "appHelp": "Have the Meshiker app? Open this link from your phone, or, in the app, import the track by pasting this link or scanning the QR code from the track list.",
+    "gpxHelp": "The GPX file is also compatible with most hiking and GPS apps."
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "body": "This page doesn't exist or has been moved.",
+    "home": "Back to home"
+  }
+}

@@ -1,18 +1,17 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { inputClass, primaryButtonClass } from "@/components/form-styles";
 
 const MIN_PASSWORD_LENGTH = 8;
 
-const ERROR_MESSAGES: Record<string, string> = {
-  weak_password: "Ce mot de passe est trop faible. Choisissez-en un plus long ou plus varié.",
-  same_password: "Le nouveau mot de passe doit être différent de l'ancien.",
-};
-
 export default function ResetForm() {
+  const t = useTranslations("Reset");
+  const tf = useTranslations("Fields");
+  const tw = useTranslations("Password");
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -24,12 +23,10 @@ export default function ResetForm() {
     setError(null);
 
     if (password.length < MIN_PASSWORD_LENGTH) {
-      return setError(
-        `Le mot de passe doit contenir au moins ${MIN_PASSWORD_LENGTH} caractères.`,
-      );
+      return setError(tw("tooShort", { min: MIN_PASSWORD_LENGTH }));
     }
     if (password !== confirm) {
-      return setError("Les deux mots de passe ne sont pas identiques.");
+      return setError(tw("mismatch"));
     }
 
     setLoading(true);
@@ -38,8 +35,11 @@ export default function ResetForm() {
 
     if (error) {
       setError(
-        ERROR_MESSAGES[error.code ?? ""] ??
-          "Modification impossible. Demandez un nouveau lien et réessayez.",
+        error.code === "weak_password"
+          ? t("errors.weak_password")
+          : error.code === "same_password"
+            ? t("errors.same_password")
+            : t("errors.generic"),
       );
       setLoading(false);
       return;
@@ -52,7 +52,7 @@ export default function ResetForm() {
   return (
     <form onSubmit={handleSubmit} className="flex w-full max-w-sm flex-col gap-4">
       <label className="flex flex-col gap-1.5 text-sm font-medium">
-        Nouveau mot de passe
+        {tf("newPassword")}
         <input
           type="password"
           required
@@ -64,7 +64,7 @@ export default function ResetForm() {
         />
       </label>
       <label className="flex flex-col gap-1.5 text-sm font-medium">
-        Confirmer le mot de passe
+        {tf("confirmPassword")}
         <input
           type="password"
           required
@@ -82,7 +82,7 @@ export default function ResetForm() {
       )}
 
       <button type="submit" disabled={loading} className={primaryButtonClass}>
-        {loading ? "Enregistrement…" : "Enregistrer le mot de passe"}
+        {loading ? t("submitting") : t("submit")}
       </button>
     </form>
   );

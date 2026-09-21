@@ -1,7 +1,9 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+import { authCallbackUrl } from "@/lib/auth-urls";
 import { createClient } from "@/lib/supabase/client";
 import {
   inputClass,
@@ -10,10 +12,11 @@ import {
 } from "@/components/form-styles";
 
 export default function ForgotForm({ expired }: { expired?: boolean }) {
+  const t = useTranslations("Forgot");
+  const tf = useTranslations("Fields");
+  const locale = useLocale();
   const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(
-    expired ? "Ce lien a expiré ou a déjà été utilisé. Demandez-en un nouveau." : null,
-  );
+  const [error, setError] = useState<string | null>(expired ? t("expired") : null);
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -24,17 +27,12 @@ export default function ForgotForm({ expired }: { expired?: boolean }) {
 
     const supabase = createClient();
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/reinitialiser-mot-de-passe`,
+      redirectTo: authCallbackUrl(window.location.origin, locale, "/reset-password"),
     });
 
     setLoading(false);
     if (error) {
-      const limited = error.code?.startsWith("over_");
-      setError(
-        limited
-          ? "Trop de demandes. Réessayez dans quelques minutes."
-          : "Envoi impossible pour le moment. Réessayez dans un instant.",
-      );
+      setError(error.code?.startsWith("over_") ? t("rateLimited") : t("failed"));
       return;
     }
     // Réponse neutre : on ne révèle pas si l'adresse possède un compte.
@@ -44,14 +42,15 @@ export default function ForgotForm({ expired }: { expired?: boolean }) {
   if (sent) {
     return (
       <div className="flex w-full max-w-sm flex-col gap-4 text-center">
-        <p className="text-lg font-medium">Vérifiez votre boîte mail</p>
+        <p className="text-lg font-medium">{t("sentTitle")}</p>
         <p className="text-zinc-600 dark:text-zinc-400">
-          Si un compte existe pour <strong>{email}</strong>, un email contenant un
-          lien de réinitialisation vient d&apos;être envoyé. Le lien est valable
-          une heure.
+          {t.rich("sentBody", {
+            email,
+            strong: (chunks) => <strong>{chunks}</strong>,
+          })}
         </p>
         <Link href="/" className={`${linkClass} text-sm`}>
-          Retour à la connexion
+          {t("back")}
         </Link>
       </div>
     );
@@ -60,7 +59,7 @@ export default function ForgotForm({ expired }: { expired?: boolean }) {
   return (
     <form onSubmit={handleSubmit} className="flex w-full max-w-sm flex-col gap-4">
       <label className="flex flex-col gap-1.5 text-sm font-medium">
-        Email
+        {tf("email")}
         <input
           type="email"
           required
@@ -78,11 +77,11 @@ export default function ForgotForm({ expired }: { expired?: boolean }) {
       )}
 
       <button type="submit" disabled={loading} className={primaryButtonClass}>
-        {loading ? "Envoi…" : "Envoyer le lien"}
+        {loading ? t("submitting") : t("submit")}
       </button>
 
       <Link href="/" className={`${linkClass} self-center text-sm`}>
-        Retour à la connexion
+        {t("back")}
       </Link>
     </form>
   );

@@ -1,10 +1,11 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
+import { authCallbackUrl } from "@/lib/auth-urls";
 import { createClient } from "@/lib/supabase/client";
-import { PSEUDO_MAX, validatePseudo } from "@/lib/pseudo";
+import { PSEUDO_MAX, PSEUDO_MIN, validatePseudo } from "@/lib/pseudo";
 import GoogleButton from "@/components/google-button";
 import {
   inputClass,
@@ -14,17 +15,12 @@ import {
 
 const MIN_PASSWORD_LENGTH = 8;
 
-const ERROR_MESSAGES: Record<string, string> = {
-  weak_password: "Ce mot de passe est trop faible. Choisissez-en un plus long ou plus varié.",
-  user_already_exists: "Un compte existe déjà avec cette adresse. Essayez de vous connecter.",
-  email_exists: "Un compte existe déjà avec cette adresse. Essayez de vous connecter.",
-  email_address_invalid: "Cette adresse email n'est pas valide.",
-  signup_disabled: "Les inscriptions sont momentanément fermées.",
-  over_request_rate_limit: "Trop de tentatives. Réessayez dans quelques minutes.",
-  over_email_send_rate_limit: "Trop d'emails envoyés. Réessayez dans quelques minutes.",
-};
-
 export default function SignupForm() {
+  const t = useTranslations("Signup");
+  const tf = useTranslations("Fields");
+  const tp = useTranslations("Pseudo");
+  const tw = useTranslations("Password");
+  const locale = useLocale();
   const router = useRouter();
   const [pseudo, setPseudo] = useState("");
   const [email, setEmail] = useState("");
@@ -34,19 +30,38 @@ export default function SignupForm() {
   const [loading, setLoading] = useState(false);
   const [sentTo, setSentTo] = useState<string | null>(null);
 
+  function messageFor(code: string | undefined) {
+    switch (code) {
+      case "weak_password":
+        return t("errors.weak_password");
+      case "user_already_exists":
+      case "email_exists":
+        return t("errors.already_exists");
+      case "email_address_invalid":
+        return t("errors.email_address_invalid");
+      case "signup_disabled":
+        return t("errors.signup_disabled");
+      case "over_request_rate_limit":
+      case "over_email_send_rate_limit":
+        return t("errors.rate_limited");
+      default:
+        return t("errors.generic");
+    }
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
 
     const checked = validatePseudo(pseudo);
-    if (!checked.ok) return setError(checked.error);
+    if (!checked.ok) {
+      return setError(tp(checked.error, { min: PSEUDO_MIN, max: PSEUDO_MAX }));
+    }
     if (password.length < MIN_PASSWORD_LENGTH) {
-      return setError(
-        `Le mot de passe doit contenir au moins ${MIN_PASSWORD_LENGTH} caractères.`,
-      );
+      return setError(tw("tooShort", { min: MIN_PASSWORD_LENGTH }));
     }
     if (password !== confirm) {
-      return setError("Les deux mots de passe ne sont pas identiques.");
+      return setError(tw("mismatch"));
     }
 
     setLoading(true);
@@ -55,17 +70,15 @@ export default function SignupForm() {
       email,
       password,
       options: {
-        // Le trigger handle_new_user lit `pseudo` dans les métadonnées.
-        data: { pseudo: checked.value },
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=/`,
+        // Le trigger handle_new_user lit `pseudo` dans les métadonnées ;
+        // `locale` choisit la langue des emails (hook send-auth-email).
+        data: { pseudo: checked.value, locale },
+        emailRedirectTo: authCallbackUrl(window.location.origin, locale),
       },
     });
 
     if (error) {
-      setError(
-        ERROR_MESSAGES[error.code ?? ""] ??
-          "Inscription impossible. Réessayez dans un instant.",
-      );
+      setError(messageFor(error.code));
       setLoading(false);
       return;
     }
@@ -86,17 +99,17 @@ export default function SignupForm() {
   if (sentTo) {
     return (
       <div className="flex w-full max-w-sm flex-col gap-4 text-center">
-        <p className="text-lg font-medium">Vérifiez votre boîte mail</p>
+        <p className="text-lg font-medium">{t("checkTitle")}</p>
         <p className="text-zinc-600 dark:text-zinc-400">
-          Si un compte peut être créé avec <strong>{sentTo}</strong>, un email de
-          confirmation vient de vous être envoyé. Cliquez sur le lien qu&apos;il
-          contient pour activer votre compte.
+          {t.rich("checkBody", {
+            email: sentTo,
+            strong: (chunks) => <strong>{chunks}</strong>,
+          })}
         </p>
         <p className="text-sm text-zinc-500">
-          Rien reçu ? Regardez dans vos courriers indésirables. Vous avez déjà un
-          compte ?{" "}
-          <Link href="/mot-de-passe-oublie" className={linkClass}>
-            Réinitialiser le mot de passe
+          {t("checkHelp")}{" "}
+          <Link href="/forgot-password" className={linkClass}>
+            {t("resetLink")}
           </Link>
           .
         </p>
@@ -108,7 +121,7 @@ export default function SignupForm() {
     <div className="flex w-full max-w-sm flex-col gap-5">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1.5 text-sm font-medium">
-          Pseudo
+          {tf("pseudo")}
           <input
             type="text"
             required
@@ -119,12 +132,11 @@ export default function SignupForm() {
             className={inputClass}
           />
           <span className="text-xs font-normal text-zinc-500">
-            Visible par les autres randonneurs (partage de position, traces
-            partagées).
+            {tf("pseudoHint")}
           </span>
         </label>
         <label className="flex flex-col gap-1.5 text-sm font-medium">
-          Email
+          {tf("email")}
           <input
             type="email"
             required
@@ -135,7 +147,7 @@ export default function SignupForm() {
           />
         </label>
         <label className="flex flex-col gap-1.5 text-sm font-medium">
-          Mot de passe
+          {tf("password")}
           <input
             type="password"
             required
@@ -147,7 +159,7 @@ export default function SignupForm() {
           />
         </label>
         <label className="flex flex-col gap-1.5 text-sm font-medium">
-          Confirmer le mot de passe
+          {tf("confirmPassword")}
           <input
             type="password"
             required
@@ -165,13 +177,13 @@ export default function SignupForm() {
         )}
 
         <button type="submit" disabled={loading} className={primaryButtonClass}>
-          {loading ? "Création du compte…" : "Créer mon compte"}
+          {loading ? t("submitting") : t("submit")}
         </button>
       </form>
 
       <div className="flex items-center gap-3 text-xs text-zinc-500">
         <span className="h-px flex-1 bg-zinc-300 dark:bg-zinc-700" />
-        ou
+        {tf("or")}
         <span className="h-px flex-1 bg-zinc-300 dark:bg-zinc-700" />
       </div>
 
@@ -188,9 +200,9 @@ export default function SignupForm() {
       />
 
       <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
-        Déjà un compte ?{" "}
+        {t("haveAccount")}{" "}
         <Link href="/" className={linkClass}>
-          Se connecter
+          {t("signIn")}
         </Link>
       </p>
     </div>

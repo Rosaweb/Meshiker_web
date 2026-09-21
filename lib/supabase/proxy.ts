@@ -5,9 +5,13 @@ import { NextResponse, type NextRequest } from "next/server";
 // jour sur la requête (pour les Server Components) et sur la réponse (pour le
 // navigateur). Aucune décision d'autorisation ici : elle se fait près des
 // données, avec getClaims()/getUser() côté serveur et le RLS en base.
-export async function updateSession(request: NextRequest) {
-  let response = NextResponse.next({ request });
-
+//
+// [response] : réponse déjà construite par le proxy de langue (redirection ou
+// réécriture) sur laquelle on ajoute les cookies ; à défaut, une réponse neutre.
+export async function updateSession(
+  request: NextRequest,
+  response: NextResponse = NextResponse.next({ request }),
+) {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -20,7 +24,6 @@ export async function updateSession(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
-          response = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             response.cookies.set(name, value, options),
           );

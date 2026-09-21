@@ -1,9 +1,10 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { PSEUDO_MAX, validatePseudo } from "@/lib/pseudo";
+import { PSEUDO_MAX, PSEUDO_MIN, validatePseudo } from "@/lib/pseudo";
 import { inputClass, primaryButtonClass } from "@/components/form-styles";
 
 // Édition du pseudo (champ `profiles.pseudo`, partagé avec l'application).
@@ -15,6 +16,8 @@ export default function PseudoForm({
   userId: string;
   initialPseudo: string;
 }) {
+  const t = useTranslations("Pseudo");
+  const tf = useTranslations("Fields");
   const router = useRouter();
   const [pseudo, setPseudo] = useState(initialPseudo);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +30,9 @@ export default function PseudoForm({
     setSaved(false);
 
     const checked = validatePseudo(pseudo);
-    if (!checked.ok) return setError(checked.error);
+    if (!checked.ok) {
+      return setError(t(checked.error, { min: PSEUDO_MIN, max: PSEUDO_MAX }));
+    }
 
     setLoading(true);
     const supabase = createClient();
@@ -41,7 +46,7 @@ export default function PseudoForm({
     setLoading(false);
 
     if (error) {
-      setError("Impossible d'enregistrer le pseudo. Réessayez dans un instant.");
+      setError(t("saveFailed"));
       return;
     }
     setPseudo(checked.value);
@@ -52,7 +57,7 @@ export default function PseudoForm({
   return (
     <form onSubmit={handleSubmit} className="flex w-full max-w-sm flex-col gap-3">
       <label className="flex flex-col gap-1.5 text-sm font-medium">
-        Pseudo
+        {tf("pseudo")}
         <input
           type="text"
           required
@@ -65,10 +70,7 @@ export default function PseudoForm({
           }}
           className={inputClass}
         />
-        <span className="text-xs font-normal text-zinc-500">
-          Visible par les autres randonneurs (partage de position, traces
-          partagées).
-        </span>
+        <span className="text-xs font-normal text-zinc-500">{tf("pseudoHint")}</span>
       </label>
 
       {error && (
@@ -78,7 +80,7 @@ export default function PseudoForm({
       )}
       {saved && (
         <p role="status" className="text-sm text-emerald-700 dark:text-emerald-400">
-          Pseudo enregistré.
+          {t("saved")}
         </p>
       )}
 
@@ -87,7 +89,7 @@ export default function PseudoForm({
         disabled={loading || pseudo.trim() === initialPseudo}
         className={primaryButtonClass}
       >
-        {loading ? "Enregistrement…" : "Enregistrer"}
+        {loading ? t("saving") : t("save")}
       </button>
     </form>
   );

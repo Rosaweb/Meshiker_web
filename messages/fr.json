@@ -1,0 +1,127 @@
+{
+  "Meta": {
+    "title": "Meshiker",
+    "description": "Application de navigation pour la randonnée"
+  },
+  "LocaleSwitcher": {
+    "label": "Langue",
+    "fr": "Français",
+    "en": "English"
+  },
+  "Home": {
+    "tagline": "Navigation et randonnée, en ligne comme hors ligne.",
+    "greeting": "Bonjour <strong>{name}</strong>",
+    "autoSessionFailed": "Impossible d'ouvrir la session automatiquement. Si vous venez de confirmer votre adresse email, connectez-vous simplement avec votre email et votre mot de passe."
+  },
+  "Fields": {
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "newPassword": "Nouveau mot de passe",
+    "pseudo": "Pseudo",
+    "pseudoHint": "Visible par les autres randonneurs (partage de position, traces partagées).",
+    "or": "ou"
+  },
+  "Pseudo": {
+    "errorLength": "Le pseudo doit contenir entre {min} et {max} caractères.",
+    "errorChars": "Le pseudo contient des caractères non autorisés.",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Pseudo enregistré.",
+    "saveFailed": "Impossible d'enregistrer le pseudo. Réessayez dans un instant."
+  },
+  "Password": {
+    "tooShort": "Le mot de passe doit contenir au moins {min} caractères.",
+    "mismatch": "Les deux mots de passe ne sont pas identiques."
+  },
+  "Login": {
+    "submit": "Se connecter",
+    "submitting": "Connexion…",
+    "forgot": "Mot de passe oublié ?",
+    "noAccount": "Pas encore de compte ?",
+    "createAccount": "Créer un compte",
+    "google": "Continuer avec Google",
+    "googleFailed": "Connexion avec Google impossible. Réessayez dans un instant.",
+    "resend": "Renvoyer l'email de confirmation",
+    "resendEnterEmail": "Saisissez votre adresse email ci-dessus, puis réessayez.",
+    "resendDone": "Email de confirmation renvoyé. Cliquez sur le lien du dernier email reçu.",
+    "resendFailed": "Envoi impossible pour le moment. Réessayez dans un instant.",
+    "linkExpired": "Ce lien a expiré ou a déjà été utilisé. Si vous avez fait plusieurs demandes, seul le dernier email reçu est valable.",
+    "failed": "La connexion a échoué. Veuillez réessayer.",
+    "errors": {
+      "invalid_credentials": "Email ou mot de passe incorrect.",
+      "email_not_confirmed": "Votre adresse email n'a pas encore été confirmée.",
+      "rate_limited": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "generic": "Connexion impossible. Réessayez dans un instant."
+    }
+  },
+  "SignOut": {
+    "button": "Se déconnecter"
+  },
+  "Signup": {
+    "metaTitle": "Créer un compte – Meshiker",
+    "title": "Créer un compte",
+    "subtitle": "Le même compte fonctionne sur le site et dans l'application.",
+    "submit": "Créer mon compte",
+    "submitting": "Création du compte…",
+    "haveAccount": "Déjà un compte ?",
+    "signIn": "Se connecter",
+    "checkTitle": "Vérifiez votre boîte mail",
+    "checkBody": "Si un compte peut être créé avec <strong>{email}</strong>, un email de confirmation vient de vous être envoyé. Cliquez sur le lien qu'il contient pour activer votre compte.",
+    "checkHelp": "Rien reçu ? Regardez dans vos courriers indésirables. Vous avez déjà un compte ?",
+    "resetLink": "Réinitialiser le mot de passe",
+    "errors": {
+      "weak_password": "Ce mot de passe est trop faible. Choisissez-en un plus long ou plus varié.",
+      "already_exists": "Un compte existe déjà avec cette adresse. Essayez de vous connecter.",
+      "email_address_invalid": "Cette adresse email n'est pas valide.",
+      "signup_disabled": "Les inscriptions sont momentanément fermées.",
+      "rate_limited": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "generic": "Inscription impossible. Réessayez dans un instant."
+    }
+  },
+  "Forgot": {
+    "metaTitle": "Mot de passe oublié – Meshiker",
+    "title": "Mot de passe oublié",
+    "subtitle": "Saisissez l'adresse de votre compte : nous vous enverrons un lien pour choisir un nouveau mot de passe.",
+    "submit": "Envoyer le lien",
+    "submitting": "Envoi…",
+    "back": "Retour à la connexion",
+    "expired": "Ce lien a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
+    "sentTitle": "Vérifiez votre boîte mail",
+    "sentBody": "Si un compte existe pour <strong>{email}</strong>, un email contenant un lien de réinitialisation vient d'être envoyé. Le lien est valable une heure.",
+    "rateLimited": "Trop de demandes. Réessayez dans quelques minutes.",
+    "failed": "Envoi impossible pour le moment. Réessayez dans un instant."
+  },
+  "Reset": {
+    "metaTitle": "Nouveau mot de passe – Meshiker",
+    "title": "Nouveau mot de passe",
+    "subtitle": "Choisissez un nouveau mot de passe pour votre compte.",
+    "submit": "Enregistrer le mot de passe",
+    "submitting": "Enregistrement…",
+    "invalidTitle": "Lien invalide",
+    "invalidBody": "Ce lien a expiré ou n'est plus valable.",
+    "requestNew": "Demander un nouveau lien",
+    "errors": {
+      "weak_password": "Ce mot de passe est trop faible. Choisissez-en un plus long ou plus varié.",
+      "same_password": "Le nouveau mot de passe doit être différent de l'ancien.",
+      "generic": "Modification impossible. Demandez un nouveau lien et réessayez."
+    }
+  },
+  "Share": {
+    "metaTitle": "Trace partagée – Meshiker",
+    "unavailableTitle": "Lien indisponible",
+    "unavailableBody": "Ce lien de partage est invalide, a expiré ou a été révoqué. Demandez à la personne qui vous l'a envoyé de le générer à nouveau.",
+    "goHome": "Aller sur meshiker.com",
+    "title": "Une trace a été partagée avec vous",
+    "sharedBy": "Partagée par {name}",
+    "validUntil": "Lien valable jusqu'au {date}",
+    "download": "Télécharger le fichier GPX",
+    "appHelp": "Vous avez l'application Meshiker ? Ouvrez ce lien depuis votre téléphone, ou, dans l'application, importez la trace en collant ce lien ou en scannant le QR code depuis la liste des traces.",
+    "gpxHelp": "Le fichier GPX est aussi compatible avec la plupart des applications de randonnée et GPS."
+  },
+  "NotFound": {
+    "title": "Page introuvable",
+    "body": "Cette page n'existe pas ou a été déplacée.",
+    "home": "Retour à l'accueil"
+  }
+}

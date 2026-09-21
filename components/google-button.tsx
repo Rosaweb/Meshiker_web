@@ -1,5 +1,7 @@
 "use client";
 
+import { useLocale, useTranslations } from "next-intl";
+import { authCallbackUrl } from "@/lib/auth-urls";
 import { createClient } from "@/lib/supabase/client";
 import { secondaryButtonClass } from "./form-styles";
 
@@ -13,17 +15,20 @@ export default function GoogleButton({
   onStart?: () => void;
   onError: (message: string) => void;
 }) {
+  const t = useTranslations("Login");
+  const locale = useLocale();
+
   async function handleClick() {
     onStart?.();
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
+      options: { redirectTo: authCallbackUrl(window.location.origin, locale) },
     });
 
     // En cas de succès le navigateur est redirigé vers Google.
     if (error) {
-      onError("Connexion avec Google impossible. Réessayez dans un instant.");
+      onError(t("googleFailed"));
     }
   }
 
@@ -34,7 +39,7 @@ export default function GoogleButton({
       disabled={disabled}
       className={secondaryButtonClass}
     >
-      Continuer avec Google
+      {t("google")}
     </button>
   );
 }

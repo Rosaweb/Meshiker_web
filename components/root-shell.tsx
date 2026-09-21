@@ -1,6 +1,6 @@
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import type { ReactNode } from "react";
+import "../app/globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,15 +12,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Meshiker",
-  description: "Application de navigation pour la randonnée",
-};
-
-export default function RootLayout({ children }: LayoutProps<"/">) {
+// <html>/<body> commun aux deux "racines" du site : les pages préfixées par la
+// langue (app/[locale]) et celles qui ne le sont pas (app/share).
+export default function RootShell({
+  locale,
+  children,
+}: {
+  locale: string;
+  children: ReactNode;
+}) {
   return (
     <html
-      lang="fr"
+      lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>

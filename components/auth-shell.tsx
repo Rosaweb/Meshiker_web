@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
+import { Link } from "@/i18n/navigation";
 
 // Cadre commun des pages d'authentification : en-tête Meshiker, titre, contenu.
 export default function AuthShell({
